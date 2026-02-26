@@ -114,6 +114,7 @@ export class AudioSystem {
       detune = 0,
       rate = 1,
       allowMultiple = false,
+      restartIfPlaying = false,
     } = options;
 
     const safeChannel = CHANNELS.includes(channel) ? channel : 'sfx';
@@ -121,7 +122,11 @@ export class AudioSystem {
     const existing = this.instances.get(instanceKey);
 
     if (existing?.isPlaying) {
-      if (!allowMultiple) {
+      if (restartIfPlaying && !allowMultiple) {
+        existing.stop();
+        existing.destroy();
+        this.instances.delete(instanceKey);
+      } else if (!allowMultiple) {
         return existing;
       }
     }
