@@ -5,6 +5,8 @@ export const AUDIO_CONFIG = {
       music: 0.6,
       sfx: 0.8,
       ambience: 0.7,
+      mapMusic: 0.6,
+      mapAmbience: 0.7,
     },
   },
   limits: {
@@ -12,10 +14,12 @@ export const AUDIO_CONFIG = {
     max: 1,
     step: 0.1,
   },
-  channelOrder: ['music', 'sfx', 'ambience'],
+  channelOrder: ['music', 'sfx', 'ambience', 'mapMusic', 'mapAmbience'],
   channelLabels: {
     music: 'Music',
     sfx: 'SFX',
     ambience: 'Ambience',
+    mapMusic: 'Map Music',
+    mapAmbience: 'Map Ambience',
   },
 };

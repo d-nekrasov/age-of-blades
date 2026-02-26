@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { AudioSystem } from '../systems/AudioSystem.js';
+import { MAP_CONFIG } from '../config/mapConfig.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +15,11 @@ export class BootScene extends Phaser.Scene {
         color: '#f2f7ff',
       })
       .setOrigin(0.5);
+
+    const { background, music, ambience } = MAP_CONFIG.assets;
+    this.load.image(background.key, background.url);
+    this.load.audio(music.key, [music.url]);
+    this.load.audio(ambience.key, [ambience.url]);
   }
 
   create() {
