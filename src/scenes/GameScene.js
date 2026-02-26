@@ -1,8 +1,12 @@
 import Phaser from 'phaser';
+import { AudioSystem } from '../systems/AudioSystem.js';
+import { Map } from '../domain/Map.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
+    this.audioSystem = null;
+    this.map = null;
     this.player = null;
     this.cursors = null;
     this.jumpKey = null;
@@ -10,8 +14,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.rectangle(640, 360, 1280, 720, 0x1e293b).setOrigin(0.5);
-    this.add.rectangle(640, 680, 1280, 80, 0x475569).setOrigin(0.5);
+    this.audioSystem = new AudioSystem(this);
+    const settings = this.registry.get('audio') || AudioSystem.readSettings();
+    this.audioSystem.setSettings(settings);
+
+    this.map = new Map(this, this.audioSystem).create();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.disposeSceneState());
+    this.events.once(Phaser.Scenes.Events.DESTROY, () => this.disposeSceneState());
 
     this.player = this.add.rectangle(200, 560, 70, 120, 0xf97316);
     this.physics.add.existing(this.player);
@@ -19,11 +28,8 @@ export class GameScene extends Phaser.Scene {
     const body = this.player.body;
     body.setCollideWorldBounds(true);
     body.setSize(70, 120);
-
-    const ground = this.add.rectangle(640, 690, 1280, 60, 0x334155).setOrigin(0.5);
-    this.physics.add.existing(ground, true);
-
-    this.physics.add.collider(this.player, ground);
+    this.physics.world.setBounds(0, 0, 1280, 720);
+    this.physics.add.collider(this.player, this.map.getCollisionBodies());
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.jumpKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -57,6 +63,18 @@ export class GameScene extends Phaser.Scene {
 
     if (Phaser.Input.Keyboard.JustDown(this.jumpKey) && body.blocked.down) {
       body.setVelocityY(-620);
+    }
+  }
+
+  disposeSceneState() {
+    if (this.map) {
+      this.map.destroy();
+      this.map = null;
+    }
+
+    if (this.audioSystem) {
+      this.audioSystem.destroy();
+      this.audioSystem = null;
     }
   }
 }
